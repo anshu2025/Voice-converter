@@ -2,19 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Text to Voice Converter</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #1E3A8A, #9333EA);
+    }
+  </style>
 </head>
-<body class="bg-gray-900 text-white flex justify-center items-center min-h-screen">
-  <div class="container bg-gray-800 p-8 rounded-lg shadow-lg w-96 text-center">
-    <h1 class="text-2xl font-bold mb-4">Text to Voice &#128264;
-        Converter</h1><hr>
+<body class="text-white flex justify-center items-center min-h-screen p-4">
+  <div class="container bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md text-center">
+    <h1 class="text-2xl font-bold mb-4">Text to Voice &#128264; Converter</h1><hr>
     
     <textarea id="text" class="w-full p-2 rounded-md bg-gray-700 text-white mt-5" placeholder="Type something..."></textarea>
     
     <select id="language" class="w-full mt-4 p-2 rounded-md bg-gray-700 text-white">
       <option value="en-US">English (US)</option>
-      <option value="en-GB">English (UK)</option>
       <option value="hi-IN">Hindi</option>
       <option value="fr-FR">French</option>
       <option value="es-ES">Spanish</option>
@@ -26,17 +30,6 @@
       <option value="ja-JP">Japanese</option>
       <option value="ko-KR">Korean</option>
       <option value="it-IT">Italian</option>
-      <option value="nl-NL">Dutch</option>
-      <option value="tr-TR">Turkish</option>
-      <option value="sv-SE">Swedish</option>
-      <option value="ta-IN">Tamil</option>
-      <option value="te-IN">Telugu</option>
-      <option value="bn-IN">Bengali</option>
-      <option value="ur-PK">Urdu</option>
-      <option value="vi-VN">Vietnamese</option>
-      <option value="th-TH">Thai</option>
-      <option value="pl-PL">Polish</option>
-      <option value="hu-HU">Hungarian</option>
     </select>
 
     <div class="mt-4">
@@ -44,7 +37,7 @@
       <input id="speed" type="range" min="0.5" max="2" step="0.1" value="1" class="w-full mt-2">
     </div>
 
-    <button onclick="speakText()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">
+    <button onclick="speakText()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md w-full">
       Speak &#128264;
     </button>
   </div>
@@ -66,7 +59,7 @@
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = language;
-      utterance.rate = parseFloat(speed); // Set speed from the slider
+      utterance.rate = parseFloat(speed);
       window.speechSynthesis.speak(utterance);
     }
   </script>
