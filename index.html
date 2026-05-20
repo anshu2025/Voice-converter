@@ -192,7 +192,37 @@ class="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 round
           class="w-full mt-5 bg-green-600 hover:bg-green-700 py-3 rounded-xl font-bold">
           🎙 Start Listening
         </button>
+<div class="grid grid-cols-2 gap-4 mt-4">
 
+  <button onclick="startRecognition()"
+    class="bg-green-600 hover:bg-green-700 py-3 rounded-xl font-bold w-full">
+
+    🎙 Start Listening
+
+  </button>
+
+  <button onclick="stopRecognition()"
+    class="bg-red-600 hover:bg-red-700 py-3 rounded-xl font-bold w-full">
+
+    ⛔ Stop Listening
+
+  </button>
+
+</div>
+
+<!-- PLAY RECORDED TEXT -->
+<button onclick="speakResultText()"
+class="mt-4 bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold w-full">
+
+🔊 Speak Converted Text
+
+</button>
+
+<!-- VOICE SELECT -->
+<select id="resultVoice"
+class="w-full mt-4 p-3 rounded-xl bg-gray-900 text-white">
+
+</select>
       </div>
 
     </div>
@@ -335,88 +365,172 @@ class="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 round
     window.speechSynthesis.cancel();
 
   }
+let recognition;
 
-  // SPEECH TO TEXT
-// VOICE TO TEXT
-function startRecognition() {
+// LOAD VOICES FOR RESULT SPEAK
+const resultVoice =
+  document.getElementById("resultVoice");
+
+function loadResultVoices(){
+
+  const voices =
+    speechSynthesis.getVoices();
+
+  resultVoice.innerHTML = "";
+
+  voices.forEach((voice, index)=>{
+
+    const option =
+      document.createElement("option");
+
+    let emoji = "🧑";
+
+    if(
+      voice.name.toLowerCase().includes("female") ||
+      voice.name.toLowerCase().includes("zira") ||
+      voice.name.toLowerCase().includes("woman")
+    ){
+      emoji = "👩";
+    }
+
+    if(
+      voice.name.toLowerCase().includes("male") ||
+      voice.name.toLowerCase().includes("david")
+    ){
+      emoji = "👨";
+    }
+
+    option.value = index;
+
+    option.textContent =
+      `${emoji} ${voice.name}`;
+
+    resultVoice.appendChild(option);
+
+  });
+
+}
+
+speechSynthesis.onvoiceschanged =
+  loadResultVoices;
+
+loadResultVoices();
+
+
+// START LISTENING
+function startRecognition(){
 
   const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-  if (!SpeechRecognition) {
+  if(!SpeechRecognition){
 
-    alert("Your browser does not support Speech Recognition");
+    alert("Speech Recognition not supported!");
 
     return;
+
   }
 
-  const recognition = new SpeechRecognition();
+  recognition =
+    new SpeechRecognition();
 
-  // LANGUAGE
   recognition.lang =
     document.getElementById("language").value;
 
-  // SETTINGS
   recognition.continuous = true;
+
   recognition.interimResults = true;
 
   let finalTranscript = "";
 
-  // START
   recognition.start();
 
   document.getElementById("result").innerHTML =
-    "🎧 Listening... Speak now";
+    "🎧 Listening...";
 
-  // RESULT
-  recognition.onresult = function (event) {
+  recognition.onresult = function(event){
 
-    let interimTranscript = "";
+    let transcript = "";
 
-    for (
+    for(
       let i = event.resultIndex;
       i < event.results.length;
       i++
-    ) {
+    ){
 
-      let transcript =
+      transcript +=
         event.results[i][0].transcript;
-
-      if (event.results[i].isFinal) {
-
-        finalTranscript += transcript + " ";
-
-      } else {
-
-        interimTranscript += transcript;
-
-      }
 
     }
 
+    finalTranscript = transcript;
+
     document.getElementById("result").innerHTML =
-      finalTranscript +
-      "<span style='color:gray'>" +
-      interimTranscript +
-      "</span>";
+      finalTranscript;
 
   };
 
-  // ERROR
-  recognition.onerror = function (event) {
+  recognition.onerror = function(event){
 
     document.getElementById("result").innerHTML =
       "❌ Error : " + event.error;
 
   };
 
-  // AUTO RESTART
-  recognition.onend = function () {
+}
 
-    recognition.start();
 
-  };
+// STOP LISTENING
+function stopRecognition(){
+
+  if(recognition){
+
+    recognition.stop();
+
+    document.getElementById("result").innerHTML +=
+      "<br><br>⛔ Listening Stopped";
+
+  }
+
+}
+
+
+// SPEAK RESULT TEXT
+function speakResultText(){
+
+  const text =
+    document.getElementById("result").innerText;
+
+  if(text.trim() === ""){
+
+    alert("No converted text found!");
+
+    return;
+
+  }
+
+  speechSynthesis.cancel();
+
+  const utterance =
+    new SpeechSynthesisUtterance(text);
+
+  const voices =
+    speechSynthesis.getVoices();
+
+  const selectedVoice =
+    voices[resultVoice.value];
+
+  if(selectedVoice){
+
+    utterance.voice =
+      selectedVoice;
+
+  }
+
+  utterance.rate = 1;
+
+  speechSynthesis.speak(utterance);
 
 }
 function downloadText(){
